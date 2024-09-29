@@ -5,7 +5,7 @@ def lambda_handler(event, context):
 
     # Get all EBS snapshots
     response = ec2.describe_snapshots(OwnerIds=['self'])
-
+    ##OwnerIds=['self'] filters the snapshots to include only those owned by the account making the request.
     # Get all active EC2 instance IDs
     instances_response = ec2.describe_instances(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
     active_instance_ids = set()
@@ -18,6 +18,8 @@ def lambda_handler(event, context):
     for snapshot in response['Snapshots']:
         snapshot_id = snapshot['SnapshotId']
         volume_id = snapshot.get('VolumeId')
+###snapshot.get('VolumeId'): This tries to retrieve the Volume ID associated with the snapshot. The get method is used instead of direct indexing to handle cases where VolumeId might not be present (e.g., if the snapshot is from a different type of backup or if it was created in a different manner).
+
 
         if not volume_id:
             # Delete the snapshot if it's not attached to any volume
